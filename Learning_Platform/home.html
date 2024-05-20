@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <title>Home</title>
+   </head>
+
+
+<style>
+
+.img{
+  background: url(https://i.pinimg.com/564x/b4/ee/d4/b4eed4636a8b0e2a53a7cc07eda409ca.jpg)no-repeat ;
+  width: 100%;
+  height: 100vh;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+.img::before{
+  content: '';
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.4);
+}
+.center{
+  position: absolute;
+  top: 52%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  padding: 0 20px;
+  text-align: center;
+}
+.center .title{
+  color: #fff;
+  font-size: 55px;
+  font-weight: 600;
+}
+.center .sub_title{
+  color: #fff;
+  font-size: 52px;
+  font-weight: 600;
+}
+.center .btns{
+  margin-top: 20px;
+}
+.center .btns button{
+  height: 55px;
+  width: 170px;
+  border-radius: 5px;
+  border: none;
+  margin: 0 10px;
+  border: 2px solid white;
+  font-size: 20px;
+  font-weight: 500;
+  padding: 0 10px;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.3s ease;
+}
+.center .btns button:first-child{
+  color: #fff;
+  background: none;
+}
+.btns button:first-child:hover{
+  background: white;
+  color: black;
+}
+.center .btns button:last-child{
+  background: white;
+  color: black;
+}
+
+</style>
+<body>
+
+  <header class="header">
+    <nav class="navbar">
+        <ul class="links">
+            <li><a href="home.html">Home</a></li>
+            <li><a href="login.html">Dashboard</a></li>
+            <li><a href="login.html">Services</a></li>
+            <li><a href="login.html">Courses</a></li>
+        </ul>
+        <div class="buttons">
+            <a href="login.html" class="login">Sign In</a>
+            <a href="signup.html" class="signup">Sign Up</a>
+        </div>
+    </nav>
+</header>
+ 
+  <div class="img"></div>
+  <div class="center">
+    <div class="title">Welcome to LearnWise</div>
+    <div class="sub_title">WE ARE HAPPY YOU'RE HERE </div>
+    <div class="btns">
+      <button id="signup">SIGN UP</button>
+      <button id="login">LOG IN</button>
+    </div>
+  </div>
+  <footer>
+    &copy;LEarningPlatform
+</footer>
+
+  <script>
+    var signupbtn = document.getElementById('signup');
+    var logninbtn = document.getElementById('login');
+
+    logninbtn.addEventListener('click', function() {
+        window.location.href = 'login.html';
+    });
+
+    signupbtn.addEventListener('click', function() {
+        window.location.href = 'signup.html';
+    });
+</script>
+</body>
+</html>

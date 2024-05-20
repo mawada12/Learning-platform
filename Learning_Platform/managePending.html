@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Approve Course Requests</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+
+<body>
+
+    <header class="header">
+        <nav class="navbar">
+            <ul class="links">
+                <li><a href="home.html">Home</a></li>
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="#">Services</a></li>
+                <li><a href="index.html">Courses</a></li>
+            </ul>
+            <div class="buttons">
+                <a href="login.html" class="login">Sign In</a>
+                <a href="signup.html" class="signup">Sign Up</a>
+            </div>
+        </nav>
+    </header>
+
+    <h2>Approve Course Pending Requests</h2>
+    <div class="container">
+        <table id="pending-courses">
+            <thead>
+                <tr>
+                    <th>Requests</th>
+                    <th>Course Name</th>
+                    <th>Category</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Pending courses will be dynamically added here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            // Fetch pending courses
+            $.get('http://localhost:3001/api/courses/courses', function (data) {
+                const coursesTable = $('#pending-courses tbody');
+                coursesTable.empty();
+                data.forEach(function (course) {
+                    var msg = "You have no requests";
+                    if (course.pendingStudents.length >= 1) {
+                        msg = "You have student requests for this course";
+                    }
+                    coursesTable.append(`
+                        <tr>
+                            <td>${msg}</td>
+                            <td>${course.name}</td>
+                            <td>${course.category}</td>
+                            <td>
+                                <button class="approve-btn" data-id="${course._id}" data-ids="${course.pendingStudents}">Approve</button>
+                                <button class="deny-btn" data-id="${course._id}" data-ids="${course.pendingStudents}">Deny</button>
+                            </td>
+                        </tr>
+                    `);
+                });
+
+                // Approve button click handler
+                $('.approve-btn').click(function () {
+                    const studentIds = $(this).data('ids');
+                    const array = studentIds.split(",");
+                    const courseId = $(this).data('id');
+
+                    $.ajax({
+                        url: `http://localhost:3001/api/courses/accept-enrollment/${courseId}`,
+                        type: 'PUT',
+                        contentType: 'application/json',
+                        data: JSON.stringify({ studentId: array }),
+                        success: function (result) {
+                            alert('Course approved successfully');
+                        },
+                        error: function (xhr, status, error) {
+                            alert('Failed to approve course: ' + xhr.responseText);
+                        }
+                    });
+                });
+
+                // Deny button click handler
+                $('.deny-btn').click(function () {
+                    const studentIds = $(this).data('ids');
+                    const array = studentIds.split(",");
+                    const courseId = $(this).data('id');
+
+                    $.ajax({
+                        url: `http://localhost:3001/api/courses/deny-enrollment/${courseId}`,
+                        type: 'PUT',
+                        contentType: 'application/json',
+                        data: JSON.stringify({ studentId: array }),
+                        success: function (result) {
+                            alert('Course denied successfully');
+                        },
+                        error: function (xhr, status, error) {
+                            alert('Failed to deny course: ' + xhr.responseText);
+                        }
+                    });
+                });
+            }).fail(function () {
+                alert('Failed to fetch pending courses');
+            });
+        });
+    </script>
+</body>
+
+</html>

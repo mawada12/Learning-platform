@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <title>Login</title>
+</head>
+<body>
+
+ <div class="container2">
+
+    <header class="header">
+        <nav class="navbar">
+            <ul class="links">
+                <li><a href="home.html">Home</a></li>
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="#">Services</a></li>
+                <li><a href="index.html">Courses</a></li>
+            </ul>
+            <div class="buttons">
+                <a href="login.html" class="login">Sign In</a>
+                <a href="signup.html" class="signup">Sign Up</a>
+            </div>
+        </nav>
+    </header>
+
+        <h2>Login</h2>
+        <form id="login-form">
+            <div>
+                <label for="email">Email:</label>
+                <input id="email" type="email" name="email" required>
+            </div>
+            <div>
+                <label for="password">Password:</label>
+                <input id="password" type="password" name="password" required>
+            </div>
+            <div>
+                <button type="submit">Login</button>
+            </div>
+            <div class="user-type">
+                <span class="role"> Role :</span>
+                <label for="admin" class="type">Admin</label>
+                <input type="radio" id="role-admin" name="role" value="Admin" required>
+                <label for="Instructor" class="type">Instructor</label>
+                <input type="radio" id="role-instructor" name="role" value="Instructor" required>
+                <label for="student" class="type">Student</label>
+                <input type="radio" id="role-student" name="role" value="Student" required><br><br>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $('#login-form').submit(function(event) {
+                event.preventDefault();
+
+                var formData = {
+                    email: $('#email').val(),
+                    password: $('#password').val(),
+                    role: $('input[name="role"]:checked').val() 
+                };
+
+                $.ajax({
+                    type: 'POST',
+                    url: 'http://localhost:3005/api/users/login',
+                    data: JSON.stringify(formData),
+                    contentType: "application/json; charset=utf-8",
+                    success: function(response) {
+                        console.log(response);
+                if (response.token) {
+                    console.log(response.token)
+                    localStorage.setItem('token', response.token);
+                    // Check user role and redirect accordingly
+                    if (response.role === 'Student') {
+                        window.location.href = '/studdash.html';
+                    } else if (response.role === 'Instructor') {
+                        window.location.href = '/dashboard.html';
+                    } else if (response.role === 'Admin') {
+                        window.location.href = '/Admin.html';
+                    } else {
+                        // Handle unexpected role
+                        alert('Unexpected role');
+                    }
+                } else {
+                    alert('Unexpected response from server');
+                }
+            },
+                    error: function(xhr, status, error) {
+                        console.error(xhr.responseText);
+                        var errorMessage = xhr.responseJSON ? xhr.responseJSON.error : 'An error occurred during login.';
+                        alert('Error: ' + errorMessage);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

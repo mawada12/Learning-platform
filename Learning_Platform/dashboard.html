@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="styles.css"> 
+</head>
+<body>
+
+    <header class="header">
+        <nav class="navbar">
+          <ul class="links">
+            <li><a href="home.html">Home</a></li>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="#">Services</a></li>
+            <li><a href="index.html">Courses</a></li>
+          </ul>
+          <div class="buttons">
+            <a href="login.html" class="signin">Sign In</a>
+            <a href="signup.html" class="signup">Sign Up</a>
+          </div>
+        </nav>
+    </header>
+
+    <h2 class="dash">Welcome to Instructor Dashboard</h2>
+    <table id="coursesTable">
+        <thead>
+            <tr>
+                <th>Course Name</th>
+                <th>Category</th>
+                <th>Rating</th>
+            </tr>
+        </thead>
+        <tbody id="coursesList"></tbody>
+    </table><br>
+        <button class="addCourseButton" id="addCourseButton">Add Course</button>
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Fetch courses data from the server
+            $.get('http://localhost:3001/api/courses/courses', function(data) {
+                // Render courses data on the dashboard
+                const coursesList = $('#coursesList');
+                coursesList.empty();
+                data.forEach(function(course) {
+                    coursesList.append(`<tr>
+                        <td>${course.name}</td>
+                        <td>${course.category}</td>
+                        <td>${course.rating}</td>
+                        <!-- Add more table cells if needed -->
+                    </tr>`);
+                });
+            });
+        });
+
+        //redirect to index.html
+        document.getElementById('addCourseButton').addEventListener('click', function() {
+            window.location.href = 'index.html';
+        });
+    </script>
+</body>
+</html>

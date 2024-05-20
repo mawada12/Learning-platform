@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Approve Courses</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+
+    <header class="header">
+        <nav class="navbar">
+          <ul class="links">
+            <li><a href="home.html">Home</a></li>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="#">Services</a></li>
+            <li><a href="index.html">Courses</a></li>
+          </ul>
+          <div class="buttons">
+            <a href="login.html" class="signin">Sign In</a>
+            <a href="signup.html" class="signup">Sign Up</a>
+          </div>
+        </nav>
+    </header>
+
+    <h2>Approve Courses</h2>
+    <div class="container3">
+        <table id="course-approval">
+            <thead>
+                <tr>
+                    <th>Course Name</th>
+                    <th>Category</th>
+                    <th>Rating</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Courses to approve will be dynamically added here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            // Fetch course content data from the server
+            $.get('http://localhost:8080/learning_project-1.0-SNAPSHOT/api/admin/viewCourse', function (data) {
+                const courseApprovalTable = $('#course-approval tbody');
+                courseApprovalTable.empty();
+                data.forEach(function (course) {
+                    courseApprovalTable.append(`
+                      <tr>
+                          <td>${course.name}</td>
+                          <td>${course.category}</td>
+                          <td>${course.rating}</td>
+                          <td><button class="approve-btn" data-id="${course._id}">Approve</button></td>
+                      </tr>
+                  `);
+                });
+
+                // Approve course button click handler
+                $('.approve-btn').click(function () {
+                    const courseId = $(this).data('id');
+                    console.log(courseId)
+                    $.ajax({
+                        url: 'http://localhost:8080/learning_project-1.0-SNAPSHOT/api/admin/approveCourse',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({id: courseId }),
+                        success: function (result) {
+                            console.log(result);
+                            alert('Course approved successfully');
+                            // Optionally, remove the approved course from the table
+                            $(`button[data-id="${courseId}"]`).closest('tr').remove();
+                        },
+                        error: function (err) {
+                            console.log(err);
+                            alert('Failed to approve course');
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>

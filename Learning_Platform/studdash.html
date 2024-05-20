@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+
+<body>
+
+    <header class="header">
+        <nav class="navbar">
+            <ul class="links">
+                <li><a href="home.html">Home</a></li>
+                <li><a href="login.html">Dashboard</a></li>
+                <li><a href="#">Services</a></li>
+                <li><a href="index.html">Courses</a></li>
+            </ul>
+            <div class="buttons">
+                <a href="login.html" class="signin">Sign In</a>
+                <a href="signup.html" class="signup">Sign Up</a>
+            </div>
+        </nav>
+    </header>
+
+    <h2>Student Dashboard</h2>
+    <div class="container5">
+        <!-- Section for current and past enrollments -->
+        <div class="section">
+            <h3>Current and Past Enrollments</h3>
+            <table id="enrollments">
+                <thead>
+                    <tr>
+                        <th>Course Name</th>
+                        <th>Category</th>
+                        <th>Rating</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Enrollments will be dynamically added here -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Section for course search and filter -->
+        <div class="section">
+            <h3>Search Courses</h3>
+            <input type="text" id="search" placeholder="Search by name or category">
+            <select id="sort">
+                <option value="rating">Sort by Rating</option>
+                <option value="name">Sort by Name</option>
+            </select>
+            <button id="search-btn">Search</button>
+
+            <table id="course-search-results">
+                <thead>
+                    <tr>
+                        <th>Course Name</th>
+                        <th>Category</th>
+                        <th>Rating</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Search results will be dynamically added here -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Section for notifications -->
+        <div class="section">
+            <h3>Notifications</h3>
+            <ul id="notifications">
+                <!-- Notifications will be dynamically added here -->
+            </ul>
+        </div>
+
+        <!-- Section for course reviews and ratings -->
+        <div class="section">
+            <h3>Review and Rate a Course</h3>
+            <select id="review-course">
+                <!-- Courses for review will be dynamically added here -->
+            </select>
+            <textarea id="review-text" placeholder="Write your review here"></textarea>
+            <select id="review-rating">
+                <option value="1">1 Star</option>
+                <option value="2">2 Stars</option>
+                <option value="3">3 Stars</option>
+                <option value="4">4 Stars</option>
+                <option value="5">5 Stars</option>
+            </select>
+            <button id="submit-review">Submit Review</button>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            // Fetch current and past enrollments
+            $.get(`http://localhost:3001/api/courses/getCurrentAndPast/${localStorage.getItem('token')}`, function (data) {
+                const enrollmentsTable = $('#enrollments tbody');
+                enrollmentsTable.empty();
+                data.courses.forEach(function (enrollment) {
+                    enrollmentsTable.append(`
+                        <tr>
+                            <td>${enrollment.name}</td>
+                            <td>${enrollment.category}</td>
+                            <td>${enrollment.rating}</td>
+                        </tr>
+                    `);
+                });
+            });
+
+            // Search and sort courses
+            $('#search-btn').click(function () {
+                const searchQuery = $('#search').val();
+                const sortOption = $('#sort').val();
+                $.get(`http://localhost:3001/api/courses/search-courses?searchKey=${searchQuery}&sort=${sortOption}`, function (data) {
+                    const resultsTable = $('#course-search-results tbody');
+                    resultsTable.empty();
+                    data.forEach(function (course) {
+                        resultsTable.append(`
+                            <tr>
+                                <td>${course.name}</td>
+                                <td>${course.category}</td>
+                                <td>${course.rating}</td>
+                                <td><button class="enroll-btn" data-id="${course._id}">Enroll</button></td>
+                            </tr>
+                        `);
+                    });
+
+                    // Enroll button click handler
+                    $('.enroll-btn').click(function () {
+                        const courseId = $(this).data('id');
+                        $.ajax({
+                            url: `http://localhost:3001/api/courses/enroll-course/${courseId}`,
+                            type: 'POST',
+                            contentType: 'application/json',
+                            data: JSON.stringify({ studentId: localStorage.getItem("token") }),
+                            success: function (result) {
+                                alert('Enrolled successfully');
+                                // Optionally, update the enrollments table or give feedback to the user
+                            },
+                            error: function (xhr, status, error) {
+                                alert('Failed to enroll: ' + xhr.responseText);
+                            }
+                        });
+                    });
+                });
+            });
+
+            // Fetch notifications
+            // $.get('http://localhost:3001/api/courses/coursesForReview/notifications', function (data) {
+            //     const notificationsList = $('#notifications');
+            //     notificationsList.empty();
+            //     data.forEach(function (notification) {
+            //         notificationsList.append(`<li>${notification.message}</li>`);
+            //     });
+            // });
+
+            // Fetch courses for review
+            $.get('http://localhost:3001/api/courses/coursesForReview', function (data) {
+                const reviewCourseSelect = $('#review-course');
+                reviewCourseSelect.empty();
+                data.forEach(function (course) {
+                    reviewCourseSelect.append(`<option value="${course._id}">${course.name}</option>`);
+                });
+            });
+
+         // Submit review and rating
+        $('#submit-review').click(function () {
+        const courseId = $('#review-course').val();
+        const reviewText = $('#review-text').val();
+        const reviewRating = $('#review-rating').val();
+
+        $.ajax({
+            url: 'http://localhost:3001/api/courses/review',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                courseId: courseId,
+                text: reviewText,
+                rating: reviewRating
+            }),
+            success: function (result) {
+                alert('Review submitted successfully');
+                $('#review-text').val('');
+                $('#review-rating').val('1');
+            },
+            error: function () {
+                alert('Failed to submit review');
+            }
+        });
+    });
+});
+</script>
+</body>
+</html>

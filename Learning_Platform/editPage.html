@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Courses</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+
+<body>
+
+    <header class="header">
+        <nav class="navbar">
+            <ul class="links">
+                <li><a href="home.html">Home</a></li>
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="#">Services</a></li>
+                <li><a href="index.html">Courses</a></li>
+            </ul>
+            <div class="buttons">
+                <a href="login.html" class="signin">Sign In</a>
+                <a href="signup.html" class="signup">Sign Up</a>
+            </div>
+        </nav>
+    </header>
+
+    <h2>Edit Courses</h2>
+    <div class="container">
+        <select id="course-select">
+            <option value="" disabled selected>Select your option</option>
+            <!-- Options will be dynamically added here -->
+        </select>
+        <form id="edit-course-form">
+            <label for="course-name">Course Name:</label>
+            <input type="text" id="course-name" name="name" required>
+
+            <label for="course-category">Category:</label>
+            <input type="text" id="course-category" name="category" required>
+
+            <label for="course-rating">Rating:</label>
+            <input type="number" id="course-rating" name="rating" min="1" max="5" required>
+
+            <button type="submit">Update Course</button>
+        </form>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            // Fetch courses for selection
+            $.get('http://localhost:3001/api/courses/coursesFordmin', function (data) {
+                const courseSelect = $('#course-select');
+                data.forEach(function (course) {
+                    courseSelect.append(`<option value="${course._id}">${course.name}</option>`);
+                });
+
+                // Fetch and display course details on selection change
+                courseSelect.change(function () {
+                    const courseId = $(this).val();
+                    if (courseId) {
+                        $.get(`http://localhost:3001/api/coursesFordmin/${courseId}`, function (course) {
+                            $('#course-name').val(course.name);
+                            $('#course-category').val(course.category);
+                            $('#course-rating').val(course.rating);
+                        });
+                    }
+                });
+
+                // Trigger change event to load details of the first course initially
+                courseSelect.trigger('change');
+            });
+
+            // Handle form submission
+            $('#edit-course-form').submit(function (event) {
+                event.preventDefault();
+                const courseId = $('#course-select').val();
+                const updatedCourse = {
+                    name: $('#course-name').val(),
+                    category: $('#course-category').val(),
+                    rating: $('#course-rating').val()
+                };
+
+                $.ajax({
+                    url: `http://localhost:8080/learning_project-1.0-SNAPSHOT/api/admin/editCourse/${courseId}`,
+                    type: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify(updatedCourse),
+                    success: function (result) {
+                        alert('Course updated successfully');
+                    },
+                    error: function (xhr, status, error) {
+                        alert('Failed to update course: ' + xhr.responseText);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

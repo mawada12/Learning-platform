@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <title>Sign Up</title>
+</head>
+<body>    
+  
+  <div class="container1">
+
+    <header class="header">
+        <nav class="navbar">
+          <ul class="links">
+            <li><a href="home.html">Home</a></li>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="#">Services</a></li>
+            <li><a href="index.html">Courses</a></li>
+          </ul>
+          <div class="buttons">
+            <a href="login.html" class="signin">Sign In</a>
+            <a href="signup.html" class="signup">Sign Up</a>
+          </div>
+        </nav>
+    </header>
+    
+        <div class="title">Sign Up</div>
+        <div class="content">
+          <form id="signup-form">
+            <div class="user-details">
+              <div class="input-box">
+                <span class="details">Username</span>
+                <input id="name"type="text" name="name" placeholder="Enter your username" required>
+              </div>
+              <div class="input-box">
+                <span class="details">Email</span>
+                <input id="email"type="text" name="email" placeholder="Enter your email" required>
+              </div>
+              <div class="input-box">
+                <span class="details">Phone Number</span>
+                <input id=""type="text" name="phoneNumber" placeholder="Enter your number" required>
+              </div>
+              <div class="input-box">
+                <span class="details">Password</span>
+                <input id="password" type="password" name="password" placeholder="Enter your password" required>
+              </div>
+              <div class="input-box">
+                <span class="details">Affiliation</span>
+                <input id="affiliation" type="text" name="affiliation" placeholder="Enter your affiliation" required>
+              </div>
+              <div class="input-box">
+                <span class="details">Years of Exp</span>
+                <input id="yearsOfExperience" type="number" name="yearsOfExperience" placeholder="Enter your years of exp" required>
+                <br><br><br>
+              </div>
+   
+            </div>
+            <div class="user-type">
+              <span class="role"> Role :</span>
+              <label for="admin" class="type">Admin</label>
+              <input type="radio" id="role-admin" name="role" value="admin" required>
+              <label for="Instructor" class="type">Instructor</label>
+              <input type="radio" id="role-instructor" name="role" value="Instructor" required>
+              <label for="student" class="type">Student</label>
+              <input type="radio" id="role-student" name="role" value="Student" required><br><br>
+          </div>
+          
+            <div class="input-box">
+                <span class="details">Bio</span><br>
+                <textarea id="bio"name="bio" placeholder="Enter your bio" required></textarea>
+              </div>
+            <div class="button">
+              <input type="submit" value="Register">
+            </div>
+          </form>
+        </div>
+    </div>
+
+    <script>
+      $(document).ready(function() {
+          $('#signup-form').submit(function(event) {
+              event.preventDefault();
+  
+              var formData = {
+                  name: $('#name').val(),
+                  email: $('#email').val(),
+                  password: $('#password').val(),
+                  affiliation: $('#affiliation').val(),
+                  yearsOfExperience: $('#yearsOfExperience').val(),
+                  role: $('input[name=role]:checked').val(), 
+                  bio: $('#bio').val()
+              };
+              console.log(formData);
+  
+              // Stringify the formData object
+              var jsonData = JSON.stringify(formData);
+  
+              $.ajax({
+                type: 'POST',
+                url: 'http://localhost:3005/api/users/register',
+                data: jsonData,
+                contentType: "application/json; charset=utf-8",
+                success: function(response) {
+                    console.log(response);
+                    alert('User registered successfully!');
+
+                    // Check if the role selected is 'Instructor'
+                    if (formData.role === 'Instructor') {
+                        // Redirect to dashboard.html
+                        window.location.href = 'dashboard.html';
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error(xhr.responseText);
+                    alert('Error: ' + xhr.responseText);
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>

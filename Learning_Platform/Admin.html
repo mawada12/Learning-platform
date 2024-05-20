@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <h2>Admin Dashboard</h2>
+  <div class="container3">
+    <header class="header">
+        <nav class="navbar">
+            <ul class="links">
+                <li><a href="home.html">Home</a></li>
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="#">Services</a></li>
+                <li><a href="index.html">Courses</a></li>
+            </ul>
+            <div class="buttons">
+                <a href="login.html" class="login">Sign In</a>
+                <a href="signup.html" class="signup">Sign Up</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- View and manage user accounts section -->
+    <div class="section">
+      <h2 class="section-header">Users Information</h2>
+      <table id="user-accounts">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Role</th>
+            <th>Email</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- User accounts will be dynamically added here -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Review course content section -->
+    <div class="section">
+      <h2 class="section-header">Review Course Content</h2>
+      <table id="course-content">
+        <thead>
+          <tr>
+            <th>Course Name</th>
+            <th>Category</th>
+            <th>Rating</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Course content will be dynamically added here -->
+        </tbody>
+      </table>
+      <button id="approve-courses-button">Approve Courses</button>
+      <button id="edit-courses-button">Edit Courses</button>
+
+    </div>
+
+    <!-- Track Platform Usage Section -->
+    <div class="section">
+      <h2 class="section-header">Review Course Content</h2>
+      <table id="track-content">
+        <thead>
+          <tr>
+            <th>Course Name</th>
+            <th>enroll Students</th>
+            <th>Rating</th>
+            <th>no# of reviews</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Course content will be dynamically added here -->
+        </tbody>
+      </table>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // Fetch user accounts data from the server
+            $.get('http://localhost:8080/learning_project-1.0-SNAPSHOT/api/admin/viewUsers', function(data) {
+                const userAccountsTable = $('#user-accounts tbody');
+                userAccountsTable.empty();
+                data.forEach(function(user) {
+                    userAccountsTable.append(`
+                        <tr>
+                            <td>${user.name}</td>
+                            <td>${user.role}</td>
+                            <td>${user.email}</td>
+                        </tr>
+                    `);
+                });
+            });
+    
+            // Fetch course content data from the server
+            $.get('http://localhost:8080/learning_project-1.0-SNAPSHOT/api/admin/viewCourse', function(data) {
+                const courseContentTable = $('#course-content tbody');
+                console.log(data)
+                courseContentTable.empty();
+                data.forEach(function(course) {
+                    courseContentTable.append(`
+                        <tr>
+                            <td>${course.name}</td>
+                            <td>${course.category}</td>
+                            <td>${course.rating}</td>
+                        </tr>
+                    `);
+                });
+            });
+
+          // Fetch track content data from the server
+          $.get('http://localhost:8080/learning_project-1.0-SNAPSHOT/api/tracking/track', function(data) {
+                const courseContentTable = $('#track-content tbody');
+                courseContentTable.empty();
+                data.forEach(function(course) {
+                    courseContentTable.append(`
+                        <tr>
+                            <td>${course.name}</td>
+                            <td>${course.enrolledStudents}</td>
+                            <td>${course.rating}</td>
+                            <td>${course.reviews}</td>
+                        </tr>
+                    `);
+                });
+            }); 
+            
+            $('#approve-courses-button').click(function() {
+                window.location.href = 'approve_courses.html';
+            });
+
+            $('#edit-courses-button').click(function() {
+                window.location.href = 'editPage.html';
+            });
+        });
+    </script>
+  </div>
+</body>
+</html>
